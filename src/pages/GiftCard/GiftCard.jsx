@@ -1,7 +1,11 @@
-import React from "react";
+import ChooseCertificate from "./components/ChooseCertificate";
 
 const GiftCard = () => {
-  return <div>GiftCard</div>;
+  return (
+    <>
+      <ChooseCertificate />
+    </>
+  );
 };
 
 export default GiftCard;
