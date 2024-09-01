@@ -1,8 +1,8 @@
-import { configureStore } from '@reduxjs/toolkit';
-import counter from './reducers/counter';
+import { configureStore } from "@reduxjs/toolkit";
+import giftCardReducer from "./reducers/counter";
 
 export default configureStore({
   reducer: {
-    counter: counter,
+    giftCard: giftCardReducer,
   },
 });
