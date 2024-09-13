@@ -51,7 +51,7 @@ const ImageSwiper = () => {
         </span>{" "}
         Посмотреть пример
       </h2>
-      <div className="flex container gap-5 m-auto">
+      <div className="flex items-center gap-4 ">
         <div className="w-2/3 m-auto">
           <Slider {...settingsMain} ref={mainSlider} className="main-slider">
             {images.map((el, index) => (
@@ -67,7 +67,7 @@ const ImageSwiper = () => {
         </div>
 
         {/* Миниатюры в сетке */}
-        <div className="shadow-2xl w-1/3 h-[420px] overflow-y-scroll  p-6 rounded-2xl ">
+        <div className="shadow-2xl w-full h-[420px] overflow-y-scroll  p-6 rounded-2xl ">
           <h2 className="text-[20px] font-main font-semibold">
             Дизайн сертификата
           </h2>
@@ -78,14 +78,14 @@ const ImageSwiper = () => {
                 onClick={() => handleThumbnailClick(index)}
                 className={`thumbnail-item cursor-pointer ${
                   currentSlide === index
-                    ? "border-2 border-pink-500 rounded-2xl"
+                    ? "border-2 border-pink-500 rounded-xl"
                     : ""
                 }`}
               >
                 <img
                   src={el.src}
                   alt={`Thumbnail ${index}`}
-                  className="w-full rounded-2xl h-20"
+                  className="w-full rounded-xl h-[60px]"
                 />
               </div>
             ))}
