@@ -81,13 +81,10 @@ const GiftForm = () => {
   const [selectedTime, setSelectedTime] = useState("");
   const navigate = useNavigate();
 
-  const key = "44444444";
-  const password = "cztef62wrwcysyubbbdnhlk1rs2cztfsqgwww7j0";
+  const key = "299669";
+  const password = "rj4F7FMGDaSPXKKqmbQR";
   const callbackUrl = "http://myshop.tj/thank_you.php";
-  const returnUrl = "http://myshop.tj";
   const orderId = "321123";
-  const gate = "km";
-  const info = "Оплата заказа";
 
   const handleAmountChange = (event, newAmount) => {
     if (newAmount !== null) {
@@ -107,60 +104,31 @@ const GiftForm = () => {
     return token;
   };
 
-  const handlePayment = () => {
-    const key = "299669"; // Присланный ключ
-    const secret = "rj4F7FMGDaSPXKKqmbQR"; // Присланный пароль
-    const token = generateToken();
+  const handlePayment = async () => {
+    const token = generateToken(); // Генерация токена
 
-    const fields = {
-      key,
-      token,
-      callbackUrl,
-      returnUrl,
-      amount,
-      orderId,
-      gate,
-      phone,
-      info,
-      email,
-    };
-
-    // Преобразуем объект в строку с параметрами (например, key=299669&amount=5000 и т.д.)
-    const fieldString = Object.entries(fields)
-      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-      .join("&");
-
-    // Генерация подписи HMAC с использованием ключа и пароля через библиотеку CryptoJS
-    const signature = CryptoJS.HmacSHA256(fieldString, secret).toString(
-      CryptoJS.enc.Hex
-    );
-
-    // Добавляем подпись к данным
-    fields.signature = signature;
-
-    // Создаем объект FormData и отправляем через fetch
-    const formData = new FormData();
-
-    for (const [name, value] of Object.entries(fields)) {
-      formData.append(name, value);
-    }
-
-    fetch("https://test-web.alif.tj/", {
+    const response = await fetch("http://localhost:3001/process-payment", {
       method: "POST",
-      body: formData,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error("Ошибка при отправке платежа");
-      })
-      .then((data) => {
-        console.log("Платеж успешно отправлен:", data);
-      })
-      .catch((error) => {
-        console.error("Ошибка:", error);
-      });
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: amount.toFixed(2), // Убедитесь, что сумма имеет два десятичных знака
+        orderId: orderId,
+        phone: "+992" + phone,
+        email: email,
+        token: token, // Отправляем токен
+        callbackUrl: callbackUrl,
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      window.location.href = data.paymentUrl; // Перенаправляем на форму оплаты
+    } else {
+      console.error("Ошибка при обработке платежа:", data.message);
+      alert(data.message || "Произошла ошибка при обработке платежа.");
+    }
   };
 
   return (
@@ -317,7 +285,7 @@ const GiftForm = () => {
           <Button
             onClick={() => {
               handlePayment();
-              navigate("giftcard/payment");
+              // navigate("giftcard/payment");
             }}
             variant="contained"
           >
