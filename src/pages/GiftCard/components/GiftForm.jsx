@@ -72,7 +72,7 @@ function UseRadioGroup({ onChange, selectedValue }) {
 }
 
 const GiftForm = () => {
-  const [amount, setAmount] = useState(500);
+  const [amount, setAmount] = useState(0);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -80,11 +80,6 @@ const GiftForm = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const navigate = useNavigate();
-
-  const key = "299669";
-  const password = "rj4F7FMGDaSPXKKqmbQR";
-  const callbackUrl = "http://myshop.tj/thank_you.php";
-  const orderId = "321123";
 
   const handleAmountChange = (event, newAmount) => {
     if (newAmount !== null) {
@@ -96,38 +91,26 @@ const GiftForm = () => {
     setSchedule(event.target.value);
   };
 
-  const generateToken = () => {
-    const formattedAmount = amount.toFixed(2);
-    const tokenString = key + orderId + formattedAmount + callbackUrl;
-    const innerHash = CryptoJS.HmacSHA256(password, key).toString();
-    const token = CryptoJS.HmacSHA256(tokenString, innerHash).toString();
-    return token;
-  };
-
   const handlePayment = async () => {
-    const token = generateToken(); // Генерация токена
-
-    const response = await fetch("http://localhost:3001/process-payment", {
+    const response = await fetch("http://localhost:3001/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        amount: amount.toFixed(2), // Убедитесь, что сумма имеет два десятичных знака
-        orderId: orderId,
-        phone: "+992" + phone,
+        amount: amount + ".00",
+        phone: phone,
         email: email,
-        token: token, // Отправляем токен
-        callbackUrl: callbackUrl,
       }),
     });
 
     const data = await response.json();
+
+    localStorage.setItem("token", data.token);
     if (data.success) {
-      window.location.href = data.paymentUrl; // Перенаправляем на форму оплаты
+      // window.location.href = data.paymentUrl; // Перенаправляем на форму оплаты
     } else {
       console.error("Ошибка при обработке платежа:", data.message);
-      alert(data.message || "Произошла ошибка при обработке платежа.");
     }
   };
 

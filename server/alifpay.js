@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const { v4: uuidv4 } = require("uuid");
 const cors = require("cors");
 const CryptoJS = require("crypto-js");
 const fetch = (...args) =>
@@ -15,74 +16,75 @@ const ALIF_PAY_URL = "https://test-web.alif.tj/";
 
 const key = "299669"; // Используемые ключ и пароль
 const password = "rj4F7FMGDaSPXKKqmbQR";
-
-// Генерация токена для запроса
-const generateToken = (orderId, amount, callbackUrl) => {
-  const formattedAmount = parseFloat(amount).toFixed(2);
-  const tokenString = key + orderId + formattedAmount + callbackUrl;
-  const innerHash = CryptoJS.HmacSHA256(password, key).toString();
-  const token = CryptoJS.HmacSHA256(tokenString, innerHash).toString();
-  return token;
-};
-
+const uniqueId = uuidv4();
+console.log("Уникальный ID:", uniqueId);
 // Обработчик платежей
-app.post("/process-payment", async (req, res) => {
-  const { amount, orderId, phone, email, callbackUrl, returnUrl, gate, info } =
-    req.body;
+app.post("", async (req, res) => {
+  const { amount, phone } = req.body;
+  let constructedString =
+    key +
+    uniqueId +
+    amount +
+    "https://testonline-api.omuz.tj/api/alif-topup-callback";
+  let algoKey = CryptoJS.HmacSHA256(password, key).toString();
+  let token = CryptoJS.HmacSHA256(constructedString, algoKey).toString();
 
-  // Генерация токена
-  const token = generateToken(orderId, amount, callbackUrl);
-  const formattedAmount = parseFloat(amount).toFixed(2);
+  console.log(
+    "token",
+    token,
+    "algoKey",
+    algoKey,
+    "constructedString",
+    constructedString
+  );
 
   try {
-    // Формируем запрос к Alif API
+    const formData = new URLSearchParams();
+    formData.append("key", key);
+    formData.append("token", token);
+    formData.append("amount", amount);
+    formData.append("orderId", uniqueId);
+    formData.append("phone", phone);
+    formData.append("email", "email@gmail.com");
+    formData.append(
+      "callbackUrl",
+      "https://testonline-api.omuz.tj/api/alif-topup-callback"
+    );
+    formData.append("returnUrl", "https://testonline.omuz.tj/");
+    formData.append("gate", "km");
+    formData.append("info", "something");
+
     const paymentResponse = await fetch(ALIF_PAY_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: JSON.stringify({
-        key: key,
-        token: token,
-        amount: formattedAmount,
-        orderId: orderId,
-        phone: phone,
-        email: email,
-        callbackUrl: callbackUrl,
-        returnUrl: returnUrl,
-        gate: gate,
-        info: info,
-      }),
+      body: formData.toString(),
     });
 
-    const responseText = await paymentResponse.text(); // Получаем полный ответ в виде текста
+    console.log("forma", formData.toString());
 
-    // Выводим весь текст ответа для диагностики
+    // Get the response as text
+    const responseText = await paymentResponse.text();
     console.log("Ответ от сервера Алиф:", responseText);
 
-    // Если ответ сервера действительно JSON, попробуем его распарсить
-    let paymentData;
-    try {
-      paymentData = JSON.parse(responseText);
-    } catch (error) {
-      console.error("Не удалось распарсить ответ как JSON:", error);
-      return res.status(400).json({
-        success: false,
-        message: "Ответ сервера не является валидным JSON.",
-        error: responseText, // Добавляем текст ответа для отладки
-      });
-    }
+    // Extract token from the HTML response
+    const tokenMatch = responseText.match(/<meta name="stk" content="([^"]+)"/);
 
-    if (paymentResponse.ok) {
+    if (tokenMatch && tokenMatch[1]) {
+      const extractedToken = tokenMatch[1]; // The extracted token
+
+      // Send the extracted token back as a response
       res.json({
         success: true,
-        paymentUrl: paymentData.paymentUrl, // Возвращаем URL для перенаправления на оплату
+        token: extractedToken.slice(8),
+        paymentUrl: ALIF_PAY_URL,
       });
     } else {
       res.status(400).json({
         success: false,
-        message: paymentData.message || "Ошибка при обработке платежа.",
-        error: responseText, // Добавляем текст ответа для отладки
+        message: "Token not found in the response.",
+        responseText: responseText, // Include the full response for debugging
       });
     }
   } catch (error) {
