@@ -16,7 +16,7 @@ import {
   Typography,
   useRadioGroup,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const StyledFormControlLabel = styled((props) => (
   <FormControlLabel {...props} />
@@ -78,7 +78,6 @@ const GiftForm = () => {
   const [schedule, setSchedule] = useState("first");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const navigate = useNavigate();
 
   const handleAmountChange = (event, newAmount) => {
     if (newAmount !== null) {
@@ -105,9 +104,9 @@ const GiftForm = () => {
 
     const data = await response.json();
 
-    localStorage.setItem("token", data.token);
     if (data.success) {
-      // window.location.href = data.paymentUrl; // Перенаправляем на форму оплаты
+      localStorage.setItem("token", data.token);
+      window.location.href = data.paymentUrl;
     } else {
       console.error("Ошибка при обработке платежа:", data.message);
     }
@@ -267,7 +266,6 @@ const GiftForm = () => {
           <Button
             onClick={() => {
               handlePayment();
-              // navigate("giftcard/payment");
             }}
             variant="contained"
           >
