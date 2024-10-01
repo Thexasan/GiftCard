@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { GiftCard, Layout, Payment } from "./routes/routes";
+import { GiftCard, Layout } from "./routes/routes";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -21,14 +21,6 @@ export default function App() {
           ),
         },
       ],
-    },
-    {
-      path: "giftcard/payment",
-      element: (
-        <Suspense fallback={<div>Loading...</div>}>
-          <Payment />
-        </Suspense>
-      ),
     },
   ]);
 

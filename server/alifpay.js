@@ -16,11 +16,10 @@ const ALIF_PAY_URL = "https://test-web.alif.tj/";
 
 const key = "299669"; // Используемые ключ и пароль
 const password = "rj4F7FMGDaSPXKKqmbQR";
-const uniqueId = uuidv4();
-console.log("Уникальный ID:", uniqueId);
 // Обработчик платежей
 app.post("", async (req, res) => {
   const { amount, phone } = req.body;
+  const uniqueId = uuidv4();
   let constructedString =
     key +
     uniqueId +
@@ -62,7 +61,7 @@ app.post("", async (req, res) => {
       body: formData.toString(),
     });
 
-    console.log("forma", formData.toString());
+    console.log("forma--------------------------", formData);
 
     // Get the response as text
     const responseText = await paymentResponse.text();

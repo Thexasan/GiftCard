@@ -105,8 +105,8 @@ const GiftForm = () => {
     const data = await response.json();
 
     if (data.success) {
+      window.open(data.paymentUrl);
       localStorage.setItem("token", data.token);
-      window.location.href = data.paymentUrl;
     } else {
       console.error("Ошибка при обработке платежа:", data.message);
     }
