@@ -76,6 +76,8 @@ app.post("", async (req, res) => {
       // Send the extracted token back as a response
       res.json({
         success: true,
+        key: key,
+        orderId: uniqueId,
         token: extractedToken.slice(8),
         paymentUrl: ALIF_PAY_URL,
       });

@@ -105,8 +105,40 @@ const GiftForm = () => {
     const data = await response.json();
 
     if (data.success) {
-      window.open(data.paymentUrl);
       localStorage.setItem("token", data.token);
+
+      // Создание и отправка формы
+      const form = document.createElement("form");
+      form.setAttribute("method", "POST");
+      // form.setAttribute("action", "https://test-web.alif.tj/");
+      form.setAttribute("id", "alifPayForm");
+
+      // Добавляем скрытые поля
+      const inputs = {
+        key: data.key, // Подставьте нужный ключ
+        token: data.token, // Токен из ответа
+        callbackUrl: "http://localhost:5173/callback", // Ваш callback URL
+        returnUrl: "http://localhost:5173/success", // Ваш URL для возврата после оплаты
+        amount: amount + ".00", // Сумма
+        orderId: data.orderId, // Ваш уникальный ID заказа
+        gate: "km", // Подставьте нужное значение
+        info: name, // Информация о получателе
+        email: email, // Email получателя
+        phone: phone, // Телефон получателя
+      };
+
+      // Создаем скрытые input'ы и добавляем их в форму
+      for (const [name, value] of Object.entries(inputs)) {
+        const input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", name);
+        input.setAttribute("value", value);
+        form.appendChild(input);
+      }
+
+      // Добавляем форму в документ и отправляем
+      document.body.appendChild(form);
+      form.submit();
     } else {
       console.error("Ошибка при обработке платежа:", data.message);
     }
