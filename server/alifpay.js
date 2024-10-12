@@ -16,15 +16,13 @@ const ALIF_PAY_URL = "https://test-web.alif.tj/";
 
 const key = "299669"; // Используемые ключ и пароль
 const password = "rj4F7FMGDaSPXKKqmbQR";
+let callbackUrl = "https://testonline-api.omuz.tj/api/alif-topup-callback";
+let returnUrl = "https://testonline.omuz.tj/";
 // Обработчик платежей
 app.post("", async (req, res) => {
-  const { amount, phone } = req.body;
+  const { amount, phone, gate, info, email } = req.body;
   const uniqueId = uuidv4();
-  let constructedString =
-    key +
-    uniqueId +
-    amount +
-    "https://testonline-api.omuz.tj/api/alif-topup-callback";
+  let constructedString = key + uniqueId + amount + callbackUrl;
   let algoKey = CryptoJS.HmacSHA256(password, key).toString();
   let token = CryptoJS.HmacSHA256(constructedString, algoKey).toString();
 
@@ -44,14 +42,11 @@ app.post("", async (req, res) => {
     formData.append("amount", amount);
     formData.append("orderId", uniqueId);
     formData.append("phone", phone);
-    formData.append("email", "email@gmail.com");
-    formData.append(
-      "callbackUrl",
-      "https://testonline-api.omuz.tj/api/alif-topup-callback"
-    );
-    formData.append("returnUrl", "https://testonline.omuz.tj/");
-    formData.append("gate", "km");
-    formData.append("info", "something");
+    formData.append("email", email);
+    formData.append("callbackUrl", callbackUrl);
+    formData.append("returnUrl", returnUrl);
+    formData.append("gate", gate);
+    formData.append("info", info);
 
     const paymentResponse = await fetch(ALIF_PAY_URL, {
       method: "POST",
@@ -78,8 +73,13 @@ app.post("", async (req, res) => {
         success: true,
         key: key,
         orderId: uniqueId,
+        phone: phone,
+        amount: amount,
+        callbackUrl: callbackUrl,
+        returnUrl: returnUrl,
+        info: info,
+        email: email,
         token: extractedToken.slice(8),
-        paymentUrl: ALIF_PAY_URL,
       });
     } else {
       res.status(400).json({

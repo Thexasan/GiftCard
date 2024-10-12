@@ -85,10 +85,13 @@ const GiftForm = () => {
     }
   };
 
+  const [gate, setGate] = useState("km");
+
   const handleScheduleChange = (event) => {
     setSchedule(event.target.value);
   };
 
+  const [paryData, setParyData] = useState("");
   const handlePayment = async () => {
     const response = await fetch("http://localhost:3001/", {
       method: "POST",
@@ -99,53 +102,22 @@ const GiftForm = () => {
         amount: amount + ".00",
         phone: phone,
         email: email,
+        gate: gate,
+        info: new Date().toLocaleString(),
       }),
     });
 
     const data = await response.json();
 
     if (data.success) {
-      localStorage.setItem("token", data.token);
-
-      // Создание и отправка формы
-      const form = document.createElement("form");
-      form.setAttribute("method", "POST");
-      // form.setAttribute("action", "https://test-web.alif.tj/");
-      form.setAttribute("id", "alifPayForm");
-
-      // Добавляем скрытые поля
-      const inputs = {
-        key: data.key, // Подставьте нужный ключ
-        token: data.token, // Токен из ответа
-        callbackUrl: "http://localhost:5173/callback", // Ваш callback URL
-        returnUrl: "http://localhost:5173/success", // Ваш URL для возврата после оплаты
-        amount: amount + ".00", // Сумма
-        orderId: data.orderId, // Ваш уникальный ID заказа
-        gate: "km", // Подставьте нужное значение
-        info: name, // Информация о получателе
-        email: email, // Email получателя
-        phone: phone, // Телефон получателя
-      };
-
-      // Создаем скрытые input'ы и добавляем их в форму
-      for (const [name, value] of Object.entries(inputs)) {
-        const input = document.createElement("input");
-        input.setAttribute("type", "hidden");
-        input.setAttribute("name", name);
-        input.setAttribute("value", value);
-        form.appendChild(input);
-      }
-
-      // Добавляем форму в документ и отправляем
-      document.body.appendChild(form);
-      form.submit();
+      setParyData(data);
     } else {
       console.error("Ошибка при обработке платежа:", data.message);
     }
   };
 
   return (
-    <section className="container mx-auto pb-[100px]">
+    <section className="container mx-auto pb-[100px] pt-[20px] md:pt-2">
       <Box
         display={"flex"}
         flexDirection={"column"}
@@ -169,19 +141,28 @@ const GiftForm = () => {
               onChange={(e) => setAmount(e.target.value)}
               margin="normal"
             />
-            <h2>Можно ввести любую сумму от 500 до 150 000 сом</h2>
+            <h2 className="text-[14px] md:text-[18px]">
+              Можно ввести любую сумму от 100 до 20 000 сом
+            </h2>
           </div>
           <ToggleButtonGroup
             value={amount}
             exclusive
+            className="flex md:block gap-3 overflow-x-scroll md:overflow-hidden scroll-smooth"
             onChange={handleAmountChange}
             fullWidth
           >
-            {[
-              500, 1000, 2000, 3000, 5000, 10000, 20000, 30000, 50000, 100000,
-              150000,
-            ].map((value) => (
-              <ToggleButton key={value} value={value}>
+            {[100, 300, 500, 700, 1000, 1500, 2000].map((value) => (
+              <ToggleButton
+                sx={{
+                  minWidth: {
+                    xs: "120px", // для телефонов
+                    md: "100px", // для десктопов
+                  },
+                }}
+                key={value}
+                value={value}
+              >
                 {value.toLocaleString()} сом
               </ToggleButton>
             ))}
@@ -198,7 +179,7 @@ const GiftForm = () => {
         </Typography>
 
         <Grid2 container spacing={2}>
-          <Grid2 item xs={12}>
+          <Grid2 item xs={12} md={4}>
             <TextField
               fullWidth
               label="Имя получателя"
@@ -207,7 +188,7 @@ const GiftForm = () => {
               helperText="Будет указано в сертификате"
             />
           </Grid2>
-          <Grid2 item xs={12}>
+          <Grid2 item xs={12} md={4}>
             <TextField
               fullWidth
               label="Телефон получателя"
@@ -222,7 +203,7 @@ const GiftForm = () => {
               required
             />
           </Grid2>
-          <Grid2 item xs={12}>
+          <Grid2 item xs={12} md={4}>
             <TextField
               fullWidth
               label="E-mail получателя"
@@ -305,6 +286,65 @@ const GiftForm = () => {
           </Button>
         </div>
       </Box>
+
+      {paryData?.success && (
+        <form
+          name="AlifPayForm"
+          action="https://test-web.alif.tj"
+          method="post"
+          id="alifPayForm"
+        >
+          <input
+            type="hidden"
+            name="token"
+            id="token"
+            value={paryData?.token}
+          />
+          <input type="hidden" name="key" id="key" value={paryData?.key} />
+          <input
+            type="hidden"
+            name="callbackUrl"
+            id="callbackUrl"
+            value={paryData?.callbackUrl}
+          />
+          {/* <!-- callback url where alif sends information about status of transactions --> */}
+          <input
+            type="hidden"
+            name="returnUrl"
+            id="returnUrl"
+            value={paryData?.returnUrl}
+          />
+          <input
+            type="hidden"
+            name="amount"
+            id="amount"
+            value={paryData?.amount}
+            required
+          />
+          <input
+            type="hidden"
+            name="orderId"
+            id="orderId"
+            value={paryData?.orderId}
+          />
+
+          <input type="hidden" name="info" id="info" value={paryData?.info} />
+
+          <input
+            type="hidden"
+            name="email"
+            id="email"
+            value={paryData?.email}
+          />
+          <input
+            type="hidden"
+            name="phone"
+            id="phone"
+            value={paryData?.phone}
+          />
+          <input type="submit" value="Пардохт бо корти милли" />
+        </form>
+      )}
     </section>
   );
 };

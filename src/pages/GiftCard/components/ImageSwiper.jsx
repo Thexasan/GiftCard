@@ -43,35 +43,36 @@ const ImageSwiper = () => {
   };
 
   return (
-    <section className="container m-auto">
-      <h2 className="underline cursor-pointer items-center flex gap-3 text-[16px] font-semibold mt-3">
-        {" "}
+    <section className="container mx-auto px-4">
+      <h2 className="underline cursor-pointer items-center flex gap-3 text-[14px] sm:text-[16px] font-semibold mt-3">
         <span>
           <RemoveRedEyeOutlinedIcon />
-        </span>{" "}
+        </span>
         Посмотреть пример
       </h2>
-      <div className="flex items-center gap-4 ">
-        <div className="w-2/3 m-auto">
+      <div className="flex flex-col md:flex-row items-center gap-4">
+        <div className="w-full md:w-2/3 mx-auto">
           <Slider {...settingsMain} ref={mainSlider} className="main-slider">
             {images.map((el, index) => (
               <div key={index}>
                 <img
                   src={el.src}
                   alt={`Slide ${index}`}
-                  className="w-full h-[420px] object-fill rounded-2xl"
+                  className="w-full h-[200px] sm:h-[250px] md:h-[420px] object-cover rounded-2xl"
                 />
               </div>
             ))}
           </Slider>
         </div>
 
-        {/* Миниатюры в сетке */}
-        <div className="shadow-2xl w-full h-[420px] overflow-y-scroll  p-6 rounded-2xl ">
-          <h2 className="text-[20px] font-main font-semibold">
+        {/* Thumbnail Section */}
+        <div className="w-full md:w-1/3 md:shadow-2xl md:h-[420px] md:overflow-y-scroll p-4 md:p-6 rounded-2xl">
+          <h2 className="text-[16px] sm:text-[20px] hidden md:block font-main font-semibold">
             Дизайн сертификата
           </h2>
-          <div className=" rounded-2xl mt-[10px] grid grid-cols-3 items-center gap-2">
+
+          {/* Horizontal Scroll Thumbnails */}
+          <div className="flex gap-3 overflow-x-scroll md:overflow-x-hidden scroll-smooth py-2 mt-2 md:grid md:grid-cols-3">
             {images.map((el, index) => (
               <div
                 key={index}
@@ -85,7 +86,7 @@ const ImageSwiper = () => {
                 <img
                   src={el.src}
                   alt={`Thumbnail ${index}`}
-                  className="w-full rounded-xl h-[60px]"
+                  className="min-w-24 md:min-w-0 w-full h-[70px] md:w-full  rounded-xl object-cover"
                 />
               </div>
             ))}
