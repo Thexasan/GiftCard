@@ -99,7 +99,7 @@ const GiftForm = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        amount: amount + ".00",
+        amount: amount + ".00", // Format amount with two decimal places
         phone: phone,
         email: email,
         gate: gate,
@@ -110,9 +110,9 @@ const GiftForm = () => {
     const data = await response.json();
 
     if (data.success) {
-      setParyData(data);
+      setParyData(data); // Save response data for form submission
     } else {
-      console.error("Ошибка при обработке платежа:", data.message);
+      console.error("Error processing payment:", data.message);
     }
   };
 
@@ -292,57 +292,19 @@ const GiftForm = () => {
           name="AlifPayForm"
           action="https://test-web.alif.tj"
           method="post"
-          id="alifPayForm"
         >
-          <input
-            type="hidden"
-            name="token"
-            id="token"
-            value={paryData?.token}
-          />
-          <input type="hidden" name="key" id="key" value={paryData?.key} />
+          <input type="hidden" name="key" value={paryData?.key} />
+          <input type="hidden" name="token" value={paryData?.token} />
           <input
             type="hidden"
             name="callbackUrl"
-            id="callbackUrl"
             value={paryData?.callbackUrl}
           />
-          {/* <!-- callback url where alif sends information about status of transactions --> */}
-          <input
-            type="hidden"
-            name="returnUrl"
-            id="returnUrl"
-            value={paryData?.returnUrl}
-          />
-          <input
-            type="hidden"
-            name="amount"
-            id="amount"
-            value={paryData?.amount}
-            required
-          />
-          <input
-            type="hidden"
-            name="orderId"
-            id="orderId"
-            value={paryData?.orderId}
-          />
-
-          <input type="hidden" name="info" id="info" value={paryData?.info} />
-
-          <input
-            type="hidden"
-            name="email"
-            id="email"
-            value={paryData?.email}
-          />
-          <input
-            type="hidden"
-            name="phone"
-            id="phone"
-            value={paryData?.phone}
-          />
-          <input type="submit" value="Пардохт бо корти милли" />
+          <input type="hidden" name="returnUrl" value={paryData?.returnUrl} />
+          <input type="hidden" name="amount" value={paryData?.amount} />
+          <input type="hidden" name="orderId" value={paryData?.orderId} />
+          <input type="hidden" name="phone" value={paryData?.phone} />
+          <input type="submit" value="Пардохт бо Корти Милли" />
         </form>
       )}
     </section>

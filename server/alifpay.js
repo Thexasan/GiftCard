@@ -8,38 +8,40 @@ const fetch = (...args) =>
 
 const app = express();
 
-// Добавляем CORS
+// Adding CORS
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(bodyParser.json());
 
 const ALIF_PAY_URL = "https://test-web.alif.tj/";
 
-const key = "299669"; // Используемые ключ и пароль
+const key = "299669";
 const password = "rj4F7FMGDaSPXKKqmbQR";
+
 let callbackUrl = "https://testonline-api.omuz.tj/api/alif-topup-callback";
 let returnUrl = "https://testonline.omuz.tj/";
-// Обработчик платежей
+
 app.post("", async (req, res) => {
   const { amount, phone, gate, info, email } = req.body;
-  const uniqueId = uuidv4();
-  let constructedString = key + uniqueId + amount + callbackUrl;
-  let algoKey = CryptoJS.HmacSHA256(password, key).toString();
-  let token = CryptoJS.HmacSHA256(constructedString, algoKey).toString();
 
-  console.log(
-    "token",
-    token,
-    "algoKey",
-    algoKey,
-    "constructedString",
-    constructedString
-  );
+  const formattedAmount = parseFloat(amount).toFixed(2);
+
+  const uniqueId = uuidv4(); // Generate unique orderId
+
+  let constructedString = key + uniqueId + formattedAmount + callbackUrl;
+
+  console.log("String for token:", constructedString);
+
+  let algoKey = CryptoJS.HmacSHA256(password, key).toString();
+  console.log("AlgoKey (Password Hash):", algoKey);
+
+  let token = CryptoJS.HmacSHA256(constructedString, algoKey).toString();
+  console.log("Generated Token:", token);
 
   try {
     const formData = new URLSearchParams();
     formData.append("key", key);
     formData.append("token", token);
-    formData.append("amount", amount);
+    formData.append("amount", formattedAmount); // Use formatted amount
     formData.append("orderId", uniqueId);
     formData.append("phone", phone);
     formData.append("email", email);
@@ -53,28 +55,25 @@ app.post("", async (req, res) => {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: formData.toString(),
+      body: formData,
     });
 
-    console.log("forma--------------------------", formData);
+    console.log("Form------------------:", formData);
 
-    // Get the response as text
     const responseText = await paymentResponse.text();
-    console.log("Ответ от сервера Алиф:", responseText);
+    console.log("AlifPay Response:", responseText);
 
-    // Extract token from the HTML response
     const tokenMatch = responseText.match(/<meta name="stk" content="([^"]+)"/);
 
     if (tokenMatch && tokenMatch[1]) {
-      const extractedToken = tokenMatch[1]; // The extracted token
+      const extractedToken = tokenMatch[1]; // Extracted token from HTML response
 
-      // Send the extracted token back as a response
       res.json({
         success: true,
         key: key,
         orderId: uniqueId,
         phone: phone,
-        amount: amount,
+        amount: formattedAmount,
         callbackUrl: callbackUrl,
         returnUrl: returnUrl,
         info: info,
@@ -85,19 +84,18 @@ app.post("", async (req, res) => {
       res.status(400).json({
         success: false,
         message: "Token not found in the response.",
-        responseText: responseText, // Include the full response for debugging
+        responseText: responseText,
       });
     }
   } catch (error) {
-    console.error("Ошибка при запросе к платежной системе:", error);
+    console.error("Error when requesting payment system:", error);
     res.status(500).json({
       success: false,
-      message: "Ошибка сервера при обработке платежа.",
+      message: "Server error while processing payment.",
     });
   }
 });
 
-// Запуск сервера
 app.listen(3001, () => {
-  console.log(`Сервер запущен на http://localhost:3001`);
+  console.log(`Server started at http://localhost:3001`);
 });
