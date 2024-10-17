@@ -329,7 +329,7 @@ const GiftForm = () => {
             type="hidden"
             name="phone"
             id="phone"
-            value={paryData?.phone}
+            value={"+992" + paryData?.phone}
           />
           <input type="submit" value="Пардохт бо Корти Милли" />
         </form>

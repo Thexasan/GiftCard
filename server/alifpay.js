@@ -42,7 +42,7 @@ app.post("", async (req, res) => {
     formData.append("token", token);
     formData.append("amount", formattedAmount); // Use formatted amount
     formData.append("orderId", uniqueId);
-    formData.append("phone", phone);
+    formData.append("phone", "+992" + phone);
     formData.append("email", email);
     formData.append("callbackUrl", callbackUrl);
     formData.append("returnUrl", returnUrl);
