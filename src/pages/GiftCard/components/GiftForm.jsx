@@ -93,26 +93,31 @@ const GiftForm = () => {
 
   const [paryData, setParyData] = useState("");
   const handlePayment = async () => {
-    const response = await fetch("http://localhost:3001/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount: amount + ".00", // Format amount with two decimal places
-        phone: phone,
-        email: email,
-        gate: gate,
-        info: new Date().toLocaleString(),
-      }),
-    });
+    let paymentData = {
+      amount: amount, // Format amount with two decimal places
+      phone: phone,
+      email: email,
+      gate: gate,
+      info: new Date().toLocaleString(),
+    };
+    console.log(paymentData);
 
-    const data = await response.json();
-
-    if (data.success) {
-      setParyData(data); // Save response data for form submission
-    } else {
-      console.error("Error processing payment:", data.message);
+    try {
+      const response = await fetch("http://localhost:3001/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setParyData(data); // Save response data for form submission
+      } else {
+        console.error("Error processing payment:", data.message);
+      }
+    } catch (error) {
+      console.error("Error processing payment:", error);
     }
   };
 
@@ -275,19 +280,8 @@ const GiftForm = () => {
             />
           </div>
         </Box>
-        <div>
-          <Button
-            onClick={() => {
-              handlePayment();
-            }}
-            variant="contained"
-          >
-            Оплатить {amount} сом
-          </Button>
-        </div>
-      </Box>
 
-      {paryData?.success && (
+        {/* {paryData?.success && ( */}
         <form
           name="AlifPayForm"
           action="https://test-web.alif.tj/"
@@ -331,9 +325,20 @@ const GiftForm = () => {
             id="phone"
             value={"+992" + paryData?.phone}
           />
-          <input type="submit" value="Пардохт бо Корти Милли" />
+          <div>
+            <Button
+              type="submit"
+              onClick={() => {
+                handlePayment();
+              }}
+              variant="contained"
+            >
+              Оплатить {amount} сом
+            </Button>
+          </div>
         </form>
-      )}
+        {/* )} */}
+      </Box>
     </section>
   );
 };

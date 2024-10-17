@@ -10,6 +10,7 @@ const app = express();
 
 // Adding CORS
 app.use(cors({ origin: "http://localhost:5173" }));
+app.use(bodyParser.json());
 
 const ALIF_PAY_URL = "https://test-web.alif.tj/";
 
@@ -42,7 +43,7 @@ app.post("", async (req, res) => {
     formData.append("token", token);
     formData.append("amount", formattedAmount); // Use formatted amount
     formData.append("orderId", uniqueId);
-    formData.append("phone", "+992" + phone);
+    formData.append("phone", phone);
     formData.append("email", email);
     formData.append("callbackUrl", callbackUrl);
     formData.append("returnUrl", returnUrl);
