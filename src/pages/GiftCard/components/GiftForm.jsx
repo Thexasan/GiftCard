@@ -193,7 +193,7 @@ const GiftForm = () => {
               fullWidth
               label="Телефон получателя"
               value={phone}
-              type="number"
+              type="text"
               onChange={(e) => setPhone(e.target.value)}
               helperText="На этот номер отправим ссылку на сертификат. Номер должен быть зарегистрирован в РФ"
               InputProps={{
@@ -290,20 +290,47 @@ const GiftForm = () => {
       {paryData?.success && (
         <form
           name="AlifPayForm"
-          action="https://test-web.alif.tj"
+          action="https://test-web.alif.tj/"
           method="post"
+          id="alifPayForm"
         >
-          <input type="hidden" name="key" value={paryData?.key} />
-          <input type="hidden" name="token" value={paryData?.token} />
+          <input type="hidden" name="key" id="key" value={paryData?.key} />
+          <input
+            type="hidden"
+            name="token"
+            id="token"
+            value={paryData?.token}
+          />
           <input
             type="hidden"
             name="callbackUrl"
+            id="callbackUrl"
             value={paryData?.callbackUrl}
           />
-          <input type="hidden" name="returnUrl" value={paryData?.returnUrl} />
-          <input type="hidden" name="amount" value={paryData?.amount} />
-          <input type="hidden" name="orderId" value={paryData?.orderId} />
-          <input type="hidden" name="phone" value={paryData?.phone} />
+          <input
+            type="hidden"
+            name="returnUrl"
+            id="returnUrl"
+            value={paryData?.returnUrl}
+          />
+          <input
+            type="hidden"
+            name="amount"
+            id="amount"
+            value={paryData?.amount}
+          />
+          <input
+            type="hidden"
+            name="orderId"
+            id="orderId"
+            value={paryData?.orderId}
+          />
+          <input
+            type="hidden"
+            name="phone"
+            id="phone"
+            value={paryData?.phone}
+          />
           <input type="submit" value="Пардохт бо Корти Милли" />
         </form>
       )}

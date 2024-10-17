@@ -10,7 +10,6 @@ const app = express();
 
 // Adding CORS
 app.use(cors({ origin: "http://localhost:5173" }));
-app.use(bodyParser.json());
 
 const ALIF_PAY_URL = "https://test-web.alif.tj/";
 
@@ -66,7 +65,7 @@ app.post("", async (req, res) => {
     const tokenMatch = responseText.match(/<meta name="stk" content="([^"]+)"/);
 
     if (tokenMatch && tokenMatch[1]) {
-      const extractedToken = tokenMatch[1]; // Extracted token from HTML response
+      // const extractedToken = tokenMatch[1]; // Extracted token from HTML response
 
       res.json({
         success: true,
@@ -78,7 +77,7 @@ app.post("", async (req, res) => {
         returnUrl: returnUrl,
         info: info,
         email: email,
-        token: extractedToken.slice(8),
+        token: token,
       });
     } else {
       res.status(400).json({
