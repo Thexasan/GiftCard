@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
-
+import React, { useCallback, useState } from "react";
+import axios from "axios";
 import { TextareaAutosize } from "@mui/base";
 import {
   Box,
@@ -81,7 +81,7 @@ const GiftForm = () => {
 
   const handleAmountChange = (event, newAmount) => {
     if (newAmount !== null) {
-      setAmount(newAmount);
+      setAmount(parseFloat(newAmount)); // Явное преобразование в число
     }
   };
 
@@ -91,35 +91,26 @@ const GiftForm = () => {
     setSchedule(event.target.value);
   };
 
-  const [paryData, setParyData] = useState("");
-  const handlePayment = async () => {
-    let paymentData = {
-      amount: amount, // Format amount with two decimal places
+  const [paryData, setParyData] = useState({});
+
+  console.log(paryData);
+  const handlePayment = useCallback(async () => {
+    const paymentData = {
+      amount: +amount, // Format amount to two decimal places
       phone: phone,
       email: email,
       gate: gate,
       info: new Date().toLocaleString(),
     };
     console.log(paymentData);
-
     try {
-      const response = await fetch("http://localhost:3001/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(paymentData),
-      });
-      const data = await response.json();
-      if (data.success) {
-        setParyData(data); // Save response data for form submission
-      } else {
-        console.error("Error processing payment:", data.message);
-      }
+      const { data } = await axios.post("http://localhost:3001/", paymentData);
+      console.log(data);
+      setParyData(data); // Save response data for form submission
     } catch (error) {
       console.error("Error processing payment:", error);
     }
-  };
+  }, [amount, phone, email, gate]);
 
   return (
     <section className="container mx-auto pb-[100px] pt-[20px] md:pt-2">
@@ -141,7 +132,7 @@ const GiftForm = () => {
           </Typography>
           <div className="flex items-center justify-start gap-5 w-full">
             <TextField
-              type="number"
+              type="text"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               margin="normal"
@@ -336,6 +327,7 @@ const GiftForm = () => {
               Оплатить {amount} сом
             </Button>
           </div>
+          {console.log(paryData)}
         </form>
         {/* )} */}
       </Box>

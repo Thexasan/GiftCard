@@ -9,7 +9,7 @@ const fetch = (...args) =>
 const app = express();
 
 // Adding CORS
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors());
 app.use(bodyParser.json());
 
 const ALIF_PAY_URL = "https://test-web.alif.tj/";
@@ -23,11 +23,11 @@ let returnUrl = "https://testonline.omuz.tj/";
 app.post("", async (req, res) => {
   const { amount, phone, gate, info, email } = req.body;
 
-  const formattedAmount = parseFloat(amount).toFixed(2);
-
   const uniqueId = uuidv4(); // Generate unique orderId
 
-  let constructedString = key + uniqueId + formattedAmount + callbackUrl;
+  const formattedPaymentAmount = +(amount - 0.01);
+
+  let constructedString = `${key}${uniqueId}${formattedPaymentAmount}${callbackUrl}`;
 
   console.log("String for token:", constructedString);
 
@@ -41,7 +41,7 @@ app.post("", async (req, res) => {
     const formData = new URLSearchParams();
     formData.append("key", key);
     formData.append("token", token);
-    formData.append("amount", formattedAmount); // Use formatted amount
+    formData.append("amount", formattedPaymentAmount); // Use formatted amount
     formData.append("orderId", uniqueId);
     formData.append("phone", phone);
     formData.append("email", email);
@@ -49,16 +49,29 @@ app.post("", async (req, res) => {
     formData.append("returnUrl", returnUrl);
     formData.append("gate", gate);
     formData.append("info", info);
+    // const userPayment = {
+    //   key: key,
+    //   token: token,
+    //   amount: +amountFormatted,
+    //   orderId: uniqueId,
+    //   phone: phone,
+    //   email: email,
+    //   callbackUrl: callbackUrl,
+    //   returnUrl: returnUrl,
+    //   gate: gate,
+    //   info: info,
+    // };
 
     const paymentResponse = await fetch(ALIF_PAY_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        // "Content-Type": "application/json",
       },
       body: formData,
     });
 
-    console.log("Form------------------:", formData);
+    console.log("userPayment------------------:", formData);
 
     const responseText = await paymentResponse.text();
     console.log("AlifPay Response:", responseText);
@@ -73,7 +86,7 @@ app.post("", async (req, res) => {
         key: key,
         orderId: uniqueId,
         phone: phone,
-        amount: formattedAmount,
+        amount: formattedPaymentAmount,
         callbackUrl: callbackUrl,
         returnUrl: returnUrl,
         info: info,
