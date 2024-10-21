@@ -17,21 +17,21 @@ const ALIF_PAY_URL = "https://test-web.alif.tj/";
 const key = "299669";
 const password = "rj4F7FMGDaSPXKKqmbQR";
 
-let callbackUrl = "https://testonline-api.omuz.tj/api/alif-topup-callback";
-let returnUrl = "https://testonline.omuz.tj/";
+let callbackUrl = "http://localhost:5173/api/alif-topup-callback";
+let returnUrl = "http://localhost:5173/";
 
 app.post("", async (req, res) => {
   const { amount, phone, gate, info, email } = req.body;
 
-  const uniqueId = uuidv4(); // Generate unique orderId
+  const orderId = uuidv4(); // Generate unique orderId
 
-  const formattedPaymentAmount = +(amount - 0.01);
+  const formattedPaymentAmount = parseFloat(amount).toFixed(2);
 
-  let constructedString = `${key}${uniqueId}${formattedPaymentAmount}${callbackUrl}`;
+  let constructedString = `${key}${orderId}${formattedPaymentAmount}${callbackUrl}`;
 
   console.log("String for token:", constructedString);
 
-  let algoKey = CryptoJS.HmacSHA256(password, key).toString();
+  let algoKey = CryptoJS.HmacSHA256(key, password).toString();
   console.log("AlgoKey (Password Hash):", algoKey);
 
   let token = CryptoJS.HmacSHA256(constructedString, algoKey).toString();
@@ -42,18 +42,21 @@ app.post("", async (req, res) => {
     formData.append("key", key);
     formData.append("token", token);
     formData.append("amount", formattedPaymentAmount); // Use formatted amount
-    formData.append("orderId", uniqueId);
+    formData.append("orderId", orderId);
     formData.append("phone", phone);
     formData.append("email", email);
     formData.append("callbackUrl", callbackUrl);
     formData.append("returnUrl", returnUrl);
     formData.append("gate", gate);
     formData.append("info", info);
+
+
+
     // const userPayment = {
     //   key: key,
     //   token: token,
-    //   amount: +amountFormatted,
-    //   orderId: uniqueId,
+    //   amount: formattedPaymentAmount,
+    //   orderId: orderId,
     //   phone: phone,
     //   email: email,
     //   callbackUrl: callbackUrl,
@@ -61,6 +64,9 @@ app.post("", async (req, res) => {
     //   gate: gate,
     //   info: info,
     // };
+
+    // console.log(userPayment);
+    
 
     const paymentResponse = await fetch(ALIF_PAY_URL, {
       method: "POST",
@@ -73,33 +79,18 @@ app.post("", async (req, res) => {
 
     console.log("userPayment------------------:", formData);
 
-    const responseText = await paymentResponse.text();
-    console.log("AlifPay Response:", responseText);
-
-    const tokenMatch = responseText.match(/<meta name="stk" content="([^"]+)"/);
-
-    if (tokenMatch && tokenMatch[1]) {
-      // const extractedToken = tokenMatch[1]; // Extracted token from HTML response
-
-      res.json({
-        success: true,
-        key: key,
-        orderId: uniqueId,
-        phone: phone,
-        amount: formattedPaymentAmount,
-        callbackUrl: callbackUrl,
-        returnUrl: returnUrl,
-        info: info,
-        email: email,
-        token: token,
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: "Token not found in the response.",
-        responseText: responseText,
-      });
-    }
+    res.json({
+      success: true,
+      key: key,
+      orderId: orderId,
+      phone: phone,
+      amount: formattedPaymentAmount,
+      callbackUrl: callbackUrl,
+      returnUrl: returnUrl,
+      info: info,
+      email: email,
+      token: token,
+    });
   } catch (error) {
     console.error("Error when requesting payment system:", error);
     res.status(500).json({

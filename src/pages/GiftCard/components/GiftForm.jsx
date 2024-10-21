@@ -93,10 +93,9 @@ const GiftForm = () => {
 
   const [paryData, setParyData] = useState({});
 
-  console.log(paryData);
   const handlePayment = useCallback(async () => {
     const paymentData = {
-      amount: +amount, // Format amount to two decimal places
+      amount: amount, // Format amount to two decimal places
       phone: phone,
       email: email,
       gate: gate,
@@ -111,6 +110,11 @@ const GiftForm = () => {
       console.error("Error processing payment:", error);
     }
   }, [amount, phone, email, gate]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let obj = {};
+  };
 
   return (
     <section className="container mx-auto pb-[100px] pt-[20px] md:pt-2">
@@ -271,66 +275,45 @@ const GiftForm = () => {
             />
           </div>
         </Box>
-
-        {/* {paryData?.success && ( */}
-        <form
-          name="AlifPayForm"
-          action="https://test-web.alif.tj/"
-          method="post"
-          id="alifPayForm"
-        >
-          <input type="hidden" name="key" id="key" value={paryData?.key} />
-          <input
-            type="hidden"
-            name="token"
-            id="token"
-            value={paryData?.token}
-          />
-          <input
-            type="hidden"
-            name="callbackUrl"
-            id="callbackUrl"
-            value={paryData?.callbackUrl}
-          />
-          <input
-            type="hidden"
-            name="returnUrl"
-            id="returnUrl"
-            value={paryData?.returnUrl}
-          />
-          <input
-            type="hidden"
-            name="amount"
-            id="amount"
-            value={paryData?.amount}
-          />
-          <input
-            type="hidden"
-            name="orderId"
-            id="orderId"
-            value={paryData?.orderId}
-          />
-          <input
-            type="hidden"
-            name="phone"
-            id="phone"
-            value={"+992" + paryData?.phone}
-          />
-          <div>
-            <Button
-              type="submit"
-              onClick={() => {
-                handlePayment();
-              }}
-              variant="contained"
-            >
-              Оплатить {amount} сом
-            </Button>
-          </div>
-          {console.log(paryData)}
-        </form>
-        {/* )} */}
       </Box>
+
+      {/* {paryData?.success && ( */}
+      <form
+        name="AlifPayForm"
+        action="https://test-web.alif.tj/"
+        method="post"
+        id="alifPayForm"
+      >
+        <input type="hidden" name="key" id="key" value={paryData?.key} />
+        <input type="hidden" name="token" id="token" value={paryData?.token} />
+        <input
+          type="hidden"
+          name="callbackUrl"
+          id="callbackUrl"
+          value={paryData?.callbackUrl}
+        />
+        <input
+          type="hidden"
+          name="returnUrl"
+          id="returnUrl"
+          value={paryData?.returnUrl}
+        />
+        <input type="hidden" name="amount" id="amount" value={10} />
+        <input
+          type="hidden"
+          name="orderId"
+          id="orderId"
+          value={paryData?.orderId}
+        />
+        <input
+          type="hidden"
+          name="phone"
+          id="phone"
+          value={"+992" + paryData?.phone}
+        />
+        <input type="submit" onClick={handlePayment} value={"Оплатить"} />
+      </form>
+      {/* )} */}
     </section>
   );
 };
