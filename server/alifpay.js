@@ -14,8 +14,8 @@ app.use(bodyParser.json());
 
 const ALIF_PAY_URL = "https://test-web.alif.tj/";
 
-const key = "299669";
-const password = "rj4F7FMGDaSPXKKqmbQR";
+const key = "552881";
+const password = "14o9Z11aceGTDha72gyW";
 
 let callbackUrl = "http://localhost:5173/api/alif-topup-callback";
 let returnUrl = "http://localhost:5173/";
@@ -27,14 +27,13 @@ app.post("", async (req, res) => {
 
   const formattedPaymentAmount = parseFloat(amount).toFixed(2);
 
-  let constructedString = `${key}${orderId}${formattedPaymentAmount}${callbackUrl}`;
-
-  console.log("String for token:", constructedString);
-
-  let algoKey = CryptoJS.HmacSHA256(key, password).toString();
+  let algoKey = CryptoJS.HmacSHA256(password, key).toString();
   console.log("AlgoKey (Password Hash):", algoKey);
 
-  let token = CryptoJS.HmacSHA256(constructedString, algoKey).toString();
+  let token = CryptoJS.HmacSHA256(
+    `${key}${orderId}${formattedPaymentAmount}${callbackUrl}`,
+    algoKey
+  ).toString();
   console.log("Generated Token:", token);
 
   try {
@@ -50,8 +49,6 @@ app.post("", async (req, res) => {
     formData.append("gate", gate);
     formData.append("info", info);
 
-
-
     // const userPayment = {
     //   key: key,
     //   token: token,
@@ -66,7 +63,6 @@ app.post("", async (req, res) => {
     // };
 
     // console.log(userPayment);
-    
 
     const paymentResponse = await fetch(ALIF_PAY_URL, {
       method: "POST",
