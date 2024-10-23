@@ -95,7 +95,7 @@ const GiftForm = () => {
 
   const handlePayment = useCallback(async () => {
     const paymentData = {
-      amount: amount, // Format amount to two decimal places
+      amount: amount, // Динамическое значение суммы
       phone: phone,
       email: email,
       gate: gate,
@@ -103,18 +103,20 @@ const GiftForm = () => {
     };
     console.log(paymentData);
     try {
-      const { data } = await axios.post("http://localhost:3001/", paymentData);
+      // Запрос на сервер для генерации токена и данных платежа
+      const { data } = await axios.post(
+        "http://localhost:3001/api/payment",
+        paymentData
+      );
       console.log(data);
-      setParyData(data); // Save response data for form submission
+      setParyData(data); // Сохраняем данные платежа для формы
+
+      // Теперь мы можем отправить форму после получения ответа от сервера
+      document.getElementById("alifPayForm").submit(); // Отправляем форму на сервер Алиф
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Ошибка при обработке платежа:", error);
     }
   }, [amount, phone, email, gate]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    let obj = {};
-  };
 
   return (
     <section className="container mx-auto pb-[100px] pt-[20px] md:pt-2">
@@ -275,6 +277,11 @@ const GiftForm = () => {
             />
           </div>
         </Box>
+        <Box sx={{ marginTop: 3 }}>
+          <Button onClick={handlePayment} variant="contained">
+            Оплатить
+          </Button>
+        </Box>
       </Box>
 
       {/* {paryData?.success && ( */}
@@ -298,7 +305,12 @@ const GiftForm = () => {
           id="returnUrl"
           value={paryData?.returnUrl}
         />
-        <input type="hidden" name="amount" id="amount" value={10} />
+        <input
+          type="hidden"
+          name="amount"
+          id="amount"
+          value={paryData?.amount}
+        />
         <input
           type="hidden"
           name="orderId"
@@ -311,7 +323,6 @@ const GiftForm = () => {
           id="phone"
           value={"+992" + paryData?.phone}
         />
-        <input type="submit" onClick={handlePayment} value={"Оплатить"} />
       </form>
       {/* )} */}
     </section>
