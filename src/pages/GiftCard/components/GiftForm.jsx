@@ -285,7 +285,6 @@ const GiftForm = () => {
               placeholder="Добавьте свои пожелания"
               variant="outlined"
               fullWidth
-              onChange={(e) => setMessage(e.target.value)}
             />
             <span className="absolute bottom-2 right-2 text-sm text-gray-500">
               0/200
