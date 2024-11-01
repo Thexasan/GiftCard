@@ -1,4 +1,3 @@
-import { TextareaAutosize } from "@mui/base";
 import {
   Box,
   Button,
@@ -15,7 +14,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import PropTypes from "prop-types";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
 const StyledFormControlLabel = styled((props) => (
   <FormControlLabel {...props} />
@@ -90,8 +89,6 @@ const GiftForm = () => {
     setSchedule(event.target.value);
   };
 
-  const [paryDataForm, setParyDataForm] = useState("");
-
   const handlePayment = async () => {
     try {
       const { data } = await axios.post(
@@ -103,7 +100,11 @@ const GiftForm = () => {
           cardType: gate,
         }
       );
-      setParyDataForm(data);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data, "text/html");
+      const form = doc.querySelector("form");
+      document.body.appendChild(form);
+      form.submit();
     } catch (error) {
       console.error(error);
     }
@@ -248,7 +249,7 @@ const GiftForm = () => {
             </Box>
           )}
         </Box>
-        <Box sx={{ marginTop: 3 }}>
+        {/* <Box sx={{ marginTop: 3 }}>
           <h2 className="font-main text-[20px] font-normal">Что написать</h2>
           <div className="flex flex-col gap-[20px]">
             <TextField
@@ -267,10 +268,33 @@ const GiftForm = () => {
               placeholder="Добавьте свои пожелания"
             />
           </div>
-        </Box>
+        </Box> */}
+
+        <div className="space-y-4">
+          <h2 className="font-main text-[20px]">Что написать</h2>
+          <TextField
+            label="Имя отправителя"
+            variant="outlined"
+            size="small"
+            fullWidth
+          />
+          <div className="relative">
+            <TextField
+              multiline
+              rows={4}
+              placeholder="Добавьте свои пожелания"
+              variant="outlined"
+              fullWidth
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <span className="absolute bottom-2 right-2 text-sm text-gray-500">
+              0/200
+            </span>
+          </div>
+        </div>
         <Box sx={{ marginTop: 3 }}>
           <Button onClick={handlePayment} variant="contained">
-            Оплатить
+            Оплатить {amount} сом
           </Button>
         </Box>
       </Box>
