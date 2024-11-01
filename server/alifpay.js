@@ -30,7 +30,9 @@ function generatePasswordHash(password, key) {
 
 // Генерация токена для Алиф
 function generatePaymentToken(key, orderId, amount, callbackUrl, passwordHash) {
-  const concatenatedString = `${key}${orderId}${amount.toFixed(2)}${callbackUrl}`;
+  const concatenatedString = `${key}${orderId}${amount.toFixed(
+    2
+  )}${callbackUrl}`;
   return CryptoJS.HmacSHA256(concatenatedString, passwordHash).toString();
 }
 
@@ -45,7 +47,13 @@ app.post("/api/payment", async (req, res) => {
   const formattedPaymentAmount = parseFloat(amount).toFixed(2); // Форматируем сумму с двумя знаками после запятой
 
   // Генерация токена на основе данных платежа
-  const token = generatePaymentToken(key, orderId, parseFloat(formattedPaymentAmount), callbackUrl, passwordHash);
+  const token = generatePaymentToken(
+    key,
+    orderId,
+    parseFloat(formattedPaymentAmount),
+    callbackUrl,
+    passwordHash
+  );
   console.log("Generated Token:", token);
 
   try {
@@ -61,6 +69,8 @@ app.post("/api/payment", async (req, res) => {
     formData.append("returnUrl", returnUrl);
     formData.append("gate", gate);
     formData.append("info", info);
+
+    console.log(formData);
 
     // Отправка запроса на сервер Алиф
     const paymentResponse = await fetch(ALIF_PAY_URL, {

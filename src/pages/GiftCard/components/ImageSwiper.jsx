@@ -33,6 +33,7 @@ const ImageSwiper = () => {
   const settingsMain = {
     arrows: false,
     fade: true,
+    accessibility: true, // Включение встроенной доступности
     initialSlide: currentSlide,
     afterChange: (index) => setCurrentSlide(index),
   };
@@ -52,9 +53,18 @@ const ImageSwiper = () => {
       </h2>
       <div className="flex flex-col md:flex-row items-center gap-4">
         <div className="w-full md:w-2/3 mx-auto">
-          <Slider {...settingsMain} ref={mainSlider} className="main-slider">
+          <Slider
+            {...settingsMain}
+            ref={mainSlider}
+            className="main-slider"
+            aria-hidden={false} // Убедитесь, что сам слайдер доступен
+          >
             {images.map((el, index) => (
-              <div key={index}>
+              <div
+                key={index}
+                aria-hidden={currentSlide !== index} // Применяйте aria-hidden только к неактивным слайдам
+                inert={currentSlide !== index} // Используйте inert для исключения фокуса
+              >
                 <img
                   src={el.src}
                   alt={`Slide ${index}`}

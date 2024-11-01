@@ -1,6 +1,3 @@
-import PropTypes from "prop-types";
-import React, { useCallback, useState } from "react";
-import axios from "axios";
 import { TextareaAutosize } from "@mui/base";
 import {
   Box,
@@ -16,7 +13,9 @@ import {
   Typography,
   useRadioGroup,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import PropTypes from "prop-types";
+import React, { useCallback, useState } from "react";
 
 const StyledFormControlLabel = styled((props) => (
   <FormControlLabel {...props} />
@@ -85,38 +84,30 @@ const GiftForm = () => {
     }
   };
 
-  const [gate, setGate] = useState("km");
+  const [gate, setGate] = useState(2);
 
   const handleScheduleChange = (event) => {
     setSchedule(event.target.value);
   };
 
-  const [paryData, setParyData] = useState({});
+  const [paryDataForm, setParyDataForm] = useState("");
 
-  const handlePayment = useCallback(async () => {
-    const paymentData = {
-      amount: amount, // Динамическое значение суммы
-      phone: phone,
-      email: email,
-      gate: gate,
-      info: new Date().toLocaleString(),
-    };
-    console.log(paymentData);
+  const handlePayment = async () => {
     try {
-      // Запрос на сервер для генерации токена и данных платежа
       const { data } = await axios.post(
-        "http://localhost:3001/api/payment",
-        paymentData
+        import.meta.env.VITE_APP_API_URL + "pays",
+        {
+          email: email,
+          phone: phone,
+          amount: +amount,
+          cardType: gate,
+        }
       );
-      console.log(data);
-      setParyData(data); // Сохраняем данные платежа для формы
-
-      // Теперь мы можем отправить форму после получения ответа от сервера
-      document.getElementById("alifPayForm").submit(); // Отправляем форму на сервер Алиф
+      setParyDataForm(data);
     } catch (error) {
-      console.error("Ошибка при обработке платежа:", error);
+      console.error(error);
     }
-  }, [amount, phone, email, gate]);
+  };
 
   return (
     <section className="container mx-auto pb-[100px] pt-[20px] md:pt-2">
@@ -283,48 +274,6 @@ const GiftForm = () => {
           </Button>
         </Box>
       </Box>
-
-      {/* {paryData?.success && ( */}
-      <form
-        name="AlifPayForm"
-        action="https://test-web.alif.tj/"
-        method="post"
-        id="alifPayForm"
-      >
-        <input type="hidden" name="key" id="key" value={paryData?.key} />
-        <input type="hidden" name="token" id="token" value={paryData?.token} />
-        <input
-          type="hidden"
-          name="callbackUrl"
-          id="callbackUrl"
-          value={paryData?.callbackUrl}
-        />
-        <input
-          type="hidden"
-          name="returnUrl"
-          id="returnUrl"
-          value={paryData?.returnUrl}
-        />
-        <input
-          type="hidden"
-          name="amount"
-          id="amount"
-          value={paryData?.amount}
-        />
-        <input
-          type="hidden"
-          name="orderId"
-          id="orderId"
-          value={paryData?.orderId}
-        />
-        <input
-          type="hidden"
-          name="phone"
-          id="phone"
-          value={"+992" + paryData?.phone}
-        />
-      </form>
-      {/* )} */}
     </section>
   );
 };
