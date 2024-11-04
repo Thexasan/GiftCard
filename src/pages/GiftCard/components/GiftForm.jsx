@@ -79,7 +79,7 @@ const GiftForm = () => {
 
   const handleAmountChange = (event, newAmount) => {
     if (newAmount !== null) {
-      setAmount(parseFloat(newAmount)); // Явное преобразование в число
+      setAmount(parseFloat(newAmount)); 
     }
   };
 
@@ -249,26 +249,6 @@ const GiftForm = () => {
             </Box>
           )}
         </Box>
-        {/* <Box sx={{ marginTop: 3 }}>
-          <h2 className="font-main text-[20px] font-normal">Что написать</h2>
-          <div className="flex flex-col gap-[20px]">
-            <TextField
-              id="standard-basic"
-              label="Имя отправителя"
-              variant="outlined"
-            />
-            <TextareaAutosize
-              style={{
-                padding: 12,
-                border: "1px solid gray",
-                borderRadius: "10px",
-              }}
-              aria-label="minimum height"
-              minRows={3}
-              placeholder="Добавьте свои пожелания"
-            />
-          </div>
-        </Box> */}
 
         <div className="space-y-4">
           <h2 className="font-main text-[20px]">Что написать</h2>
